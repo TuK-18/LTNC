@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+#include <SDL.h>
 #include <SDL_ttf.h>
 #include <SDL_image.h>
 #include <cstdlib>
@@ -24,21 +24,20 @@ SDL_Texture* smallText = nullptr;
 
 SDL_Rect bigButton = { 150, 300, 200, 100 };
 SDL_Rect smallButton = { 450, 300, 200, 100 };
-SDL_Texture* diceTextures[6] = { nullptr }; // Mảng lưu ảnh xúc xắc
+SDL_Texture* diceTextures[6] = { nullptr }; //  ảnh xúc xắc
 
 TTF_Font* font = nullptr;
 TTF_Font* smallFont = nullptr;
-Mix_Music* backgroundMusic = nullptr;  // Biến để lưu trữ nhạc nền
+Mix_Music* backgroundMusic = nullptr;  
 
 enum GameState { CHOOSE, RESULT };
 
 GameState currentState = CHOOSE;
 
 int maxTurns = 10;
-int currentTurn = 5;
+int currentTurn = 3;
 bool gameOver = false;
 int remainingTurns = 5;
-// Hàm khởi tạo SDL và SDL_mixer
 bool init() {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) return false;
     if (TTF_Init() == -1) return false;
@@ -97,7 +96,7 @@ void showGameRules() {
     SDL_Color buttonColor = { 0, 200, 0 };
     SDL_Color hoverColor = { 0, 255, 0 };
 
-    // Load background image
+    // Load background
     SDL_Surface* bgSurface = IMG_Load("cobac.jpg");
     SDL_Texture* bgTexture = SDL_CreateTextureFromSurface(renderer, bgSurface);
     SDL_FreeSurface(bgSurface);
@@ -116,12 +115,11 @@ void showGameRules() {
 
     SDL_Rect buttonRect = { SCREEN_WIDTH / 2 - 100, 400, 200, 60 };
 
-    // Tạo texture cho chữ "PLAY"
+    //  "PLAY"
     SDL_Surface* buttonSurface = TTF_RenderText_Blended(font, "PLAY", white);
     SDL_Texture* buttonTexture = SDL_CreateTextureFromSurface(renderer, buttonSurface);
     SDL_FreeSurface(buttonSurface);
 
-    // Đo kích thước chữ
     int textW, textH;
     TTF_SizeText(font, "PLAY", &textW, &textH);
     SDL_Rect textRect = {
@@ -146,24 +144,24 @@ void showGameRules() {
             }
         }
 
-        // Vẽ nền
+        // nền
         SDL_RenderCopy(renderer, bgTexture, nullptr, nullptr);
 
-        // Vẽ luật chơi
+        // luật chơi
         SDL_RenderCopy(renderer, ruleTexture, nullptr, &ruleRect);
 
-        // Vẽ nút
+        // nút
         SDL_SetRenderDrawColor(renderer, isHover ? hoverColor.r : buttonColor.r,
             isHover ? hoverColor.g : buttonColor.g,
             isHover ? hoverColor.b : buttonColor.b,
             255);
         SDL_RenderFillRect(renderer, &buttonRect);
 
-        // Vẽ viền nút
+        // viền nút
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);  // Viền đen
         SDL_RenderDrawRect(renderer, &buttonRect);
 
-        // Vẽ chữ
+        // chữ
         SDL_RenderCopy(renderer, buttonTexture, nullptr, &textRect);
 
         SDL_RenderPresent(renderer);
@@ -177,7 +175,7 @@ void showGameRules() {
 
 
 
-// Hàm load ảnh
+// load ảnh
 SDL_Texture* loadTexture(const string& path) {
     return IMG_LoadTexture(renderer, path.c_str());
 }
@@ -193,17 +191,14 @@ SDL_Texture* renderText(const string& message, SDL_Color color, TTF_Font* usedFo
 
 
 
-// Hiển thị màn hình chọn Big/Small
-// Hiển thị màn hình chọn Big/Small
+//  chọn Big/Small
 void renderChooseScreen() {
-    // Lấy vị trí chuột
     int mouseX, mouseY;
     SDL_GetMouseState(&mouseX, &mouseY);
 
     // Hiển thị ảnh nền
     SDL_RenderCopy(renderer, background1, nullptr, nullptr);
 
-    // Kiểm tra hover từng nút
     bool hoverBig = (mouseX >= bigButton.x && mouseX <= bigButton.x + bigButton.w &&
         mouseY >= bigButton.y && mouseY <= bigButton.y + bigButton.h);
     bool hoverSmall = (mouseX >= smallButton.x && mouseX <= smallButton.x + smallButton.w &&
@@ -219,12 +214,12 @@ void renderChooseScreen() {
     SDL_SetRenderDrawColor(renderer, smallColor.r, smallColor.g, smallColor.b, smallColor.a);
     SDL_RenderFillRect(renderer, &smallButton);
 
-    // Vẽ viền nút cho đẹp
+    // Vẽ viền nút 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // viền đen
     SDL_RenderDrawRect(renderer, &bigButton);
     SDL_RenderDrawRect(renderer, &smallButton);
 
-    // Căn giữa chữ trong nút BIG
+    // Căn giữa chữ 
     int bigTextW = 0, bigTextH = 0;
     SDL_QueryTexture(bigText, nullptr, nullptr, &bigTextW, &bigTextH);
     SDL_Rect bigTextRect = {
@@ -234,7 +229,6 @@ void renderChooseScreen() {
     };
     SDL_RenderCopy(renderer, bigText, nullptr, &bigTextRect);
 
-    // Căn giữa chữ trong nút SMALL
     int smallTextW = 0, smallTextH = 0;
     SDL_QueryTexture(smallText, nullptr, nullptr, &smallTextW, &smallTextH);
     SDL_Rect smallTextRect = {
@@ -261,7 +255,7 @@ void renderChooseScreen() {
 
 
 
-// Hiển thị kết quả bằng ảnh xúc xắc
+// ảnh xúc xắc 
 void renderResultScreen(int dice1, int dice2, int dice3, int sum, bool playerChoice) {
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, background2, nullptr, nullptr);
@@ -269,13 +263,13 @@ void renderResultScreen(int dice1, int dice2, int dice3, int sum, bool playerCho
     SDL_Color white = { 255, 255, 255 };
     SDL_Rect diceRect = { 220, 100, 100, 100 };
 
-    // Hiệu ứng xúc xắc xoay nhanh
+    // Hiệu ứng xúc xắc xoay 
     for (int i = 0; i < 10; ++i) {
         int temp1 = (rand() % 6);
         int temp2 = (rand() % 6);
         int temp3 = (rand() % 6);
 
-        // Vẽ 3 viên xúc xắc tạm
+        // 3 xúc xắc
         diceRect.x = 220;
         SDL_RenderCopy(renderer, diceTextures[temp1], nullptr, &diceRect);
 
@@ -286,11 +280,10 @@ void renderResultScreen(int dice1, int dice2, int dice3, int sum, bool playerCho
         SDL_RenderCopy(renderer, diceTextures[temp3], nullptr, &diceRect);
 
         SDL_RenderPresent(renderer);
-        SDL_Delay(50);  // Tạm dừng 70ms cho hiệu ứng
-        //SDL_RenderClear(renderer); // Xóa màn hình trước khi vẽ lại
+        SDL_Delay(50);  // dừng 5s
     }
 
-    // Hiển thị kết quả thật
+    // 3 xuc xac
     diceRect = { 220, 100, 100, 100 };
     SDL_RenderCopy(renderer, diceTextures[dice1 - 1], nullptr, &diceRect);
     SDL_RenderPresent(renderer);
@@ -306,9 +299,9 @@ void renderResultScreen(int dice1, int dice2, int dice3, int sum, bool playerCho
     SDL_RenderPresent(renderer);
     this_thread::sleep_for(chrono::milliseconds(500));
 
-    // Hiển thị kết quả
+    
     bool actualResult = sum > 10;
-    string resultText = "Total: " + to_string(sum) + " (" + (actualResult ? "Tai" : "Xiu") + ")";
+    string resultText = "Total: " + to_string(sum) + " (" + (actualResult ? "Big" : "Small") + ")";
     resultText += (playerChoice == actualResult) ? " - You WIN!" : " - You LOSE!";
     SDL_Texture* resultTexture = renderText(resultText, white, font);
 
@@ -319,7 +312,7 @@ void renderResultScreen(int dice1, int dice2, int dice3, int sum, bool playerCho
     SDL_RenderPresent(renderer);
     this_thread::sleep_for(chrono::seconds(2));
 
-    currentState = CHOOSE;  // Quay lại màn hình chọn
+	currentState = CHOOSE;  // về trang chọn
 }
 
 int score = 0;
@@ -328,10 +321,10 @@ int loseCount = 0;
 int bigCount = 0;
 int smallCount = 0;
 
-// Hàm render bảng điểm
+// bảng điểm
 void renderScoreboard() {
     SDL_Color white = { 255, 255, 255 };
-    SDL_Color bgColor = { 0, 0, 0, 150 }; // Màu nền mờ
+    SDL_Color bgColor = { 0, 0, 0, 150 };
 
     std::vector<std::string> lines = {
         "Score: " + std::to_string(score),
@@ -346,13 +339,13 @@ void renderScoreboard() {
     int width = 200;
     int height = lineHeight * lines.size() + 20;
 
-    // Vẽ nền scoreboard
+	// scoreboard background
     SDL_Rect bgRect = { x - 10, y - 10, width, height };
     SDL_SetRenderDrawColor(renderer, bgColor.r, bgColor.g, bgColor.b, bgColor.a);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_RenderFillRect(renderer, &bgRect);
 
-    // Vẽ từng dòng text
+    // Vẽ text
     for (size_t i = 0; i < lines.size(); ++i) {
         SDL_Texture* lineTexture = renderText(lines[i], white, font);
         int textW, textH;
@@ -365,15 +358,15 @@ void renderScoreboard() {
 
 
 
-// Cập nhật điểm sau khi kết quả được tính
+// update điểm
 void updateScore(bool playerChoice, bool actualResult) {
         if (playerChoice == actualResult) {
-            score += 10;      // Thắng +10 điểm
+            score += 10; 
             winCount++;
             currentTurn++;
         }
         else {
-            score -= 5;       // Thua -5 điểm
+            score -= 5;    
             loseCount++;
             currentTurn--;
         }
@@ -381,7 +374,7 @@ void updateScore(bool playerChoice, bool actualResult) {
         if (playerChoice) bigCount++;
         else smallCount++;
 
-        // Kiểm tra kết thúc game
+        // check end game
         if (!currentTurn) {
             gameOver = true;
         }
@@ -391,37 +384,37 @@ void renderGameOverScreen() {
     SDL_Event e;
     bool proceed = false;
     bool quit = false;
-    SDL_Color white = { 255, 255, 255 };  // Màu chữ trắng
-    SDL_Color buttonColor = { 0, 200, 0 };  // Màu xanh lá cho nút Play Again
 
-    // Tạo chữ "Game Over" với phông chữ và màu sắc
-    SDL_Surface* overSurface = TTF_RenderText_Solid(font, "Game Over", white);
-    SDL_Texture* overTexture = SDL_CreateTextureFromSurface(renderer, overSurface);
-    SDL_FreeSurface(overSurface);
+    SDL_Color white = { 255, 255, 255 };
+    SDL_Color buttonColor = { 0, 200, 0 };
 
-    SDL_Rect overRect = { SCREEN_WIDTH / 2 - 150, 150, 300, 60 };
+    const char* lines[] = {
+        "Game Over",
+        "Nguoi khong choi la nguoi thang",
+        "Nguoi choi khong bao gio thang"
+    };
+    int numLines = 3;
+    int lineSpacing = 10;
+    int startY = 150;
 
-    // Tạo nút "Play Again"
-    SDL_Rect buttonRect = { SCREEN_WIDTH / 2 - 75, 300, 150, 60 };
+    // "Play Again"
+    SDL_Rect buttonRect = { SCREEN_WIDTH / 2 - 75, 350, 150, 60 };
     SDL_Surface* buttonSurface = TTF_RenderText_Solid(font, "Play Again", white);
     SDL_Texture* buttonTexture = SDL_CreateTextureFromSurface(renderer, buttonSurface);
     SDL_FreeSurface(buttonSurface);
 
     SDL_Rect textRect = { buttonRect.x + 10, buttonRect.y + 10, 130, 40 };
 
-    while (!proceed) {
+    while (!proceed && !quit) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
-                quit = true;  // Đảm bảo thoát nếu người dùng muốn đóng game
+                quit = true;
             }
-
-            // Kiểm tra nếu người chơi nhấn nút "Play Again"
-            if (e.type == SDL_MOUSEBUTTONDOWN) {
+            else if (e.type == SDL_MOUSEBUTTONDOWN) {
                 int x = e.button.x, y = e.button.y;
                 if (x >= buttonRect.x && x <= buttonRect.x + buttonRect.w &&
                     y >= buttonRect.y && y <= buttonRect.y + buttonRect.h) {
-                    proceed = true;  // Người chơi muốn chơi lại
-                    // Reset lại trạng thái của trò chơi
+                    proceed = true;
                     currentTurn = 0;
                     score = winCount = loseCount = bigCount = smallCount = 0;
                     gameOver = false;
@@ -430,27 +423,40 @@ void renderGameOverScreen() {
             }
         }
 
-        // Vẽ nền đen cho màn hình game over
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);  // Màu nền đen
-        SDL_RenderClear(renderer);  // Làm mới màn hình với nền đen
+        //background
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
 
-        // Vẽ chữ "Game Over"
-        SDL_RenderCopy(renderer, overTexture, nullptr, &overRect);
+        // over
+        for (int i = 0; i < numLines; i++) {
+            SDL_Surface* lineSurface = TTF_RenderText_Solid(font, lines[i], white);
+            SDL_Texture* lineTexture = SDL_CreateTextureFromSurface(renderer, lineSurface);
+
+            SDL_Rect lineRect;
+            lineRect.w = lineSurface->w;
+            lineRect.h = lineSurface->h;
+            lineRect.x = SCREEN_WIDTH / 2 - lineRect.w / 2;
+            lineRect.y = startY + i * (lineRect.h + lineSpacing);
+
+            SDL_RenderCopy(renderer, lineTexture, nullptr, &lineRect);
+
+            SDL_FreeSurface(lineSurface);
+            SDL_DestroyTexture(lineTexture);
+        }
 
         // Vẽ nút "Play Again"
-        SDL_SetRenderDrawColor(renderer, buttonColor.r, buttonColor.g, buttonColor.b, 255);  // Nút màu xanh lá
-        SDL_RenderFillRect(renderer, &buttonRect);  // Vẽ hình chữ nhật nút
-        SDL_RenderCopy(renderer, buttonTexture, nullptr, &textRect);  // Vẽ chữ trên nút
+        SDL_SetRenderDrawColor(renderer, buttonColor.r, buttonColor.g, buttonColor.b, 255);
+        SDL_RenderFillRect(renderer, &buttonRect);
+        SDL_RenderCopy(renderer, buttonTexture, nullptr, &textRect);
 
-        SDL_RenderPresent(renderer);  // Cập nhật màn hình
+        SDL_RenderPresent(renderer);
     }
 
-    // Dọn dẹp bộ nhớ
-    SDL_DestroyTexture(overTexture);
     SDL_DestroyTexture(buttonTexture);
 }
 
-// Vòng lặp game
+
+// loop
 void gameLoop() {
     bool quit = false;
     SDL_Event e;
@@ -511,12 +517,12 @@ void gameLoop() {
             renderGameOverScreen();
         }
 
-        SDL_RenderPresent(renderer);  // Vẽ mọi thứ
+        SDL_RenderPresent(renderer);  
     }
 }
 
 
-// Dọn dẹp bộ nhớ
+// clear
 void close() {
     //Mix_HaltMusic();  // Dừng nhạc nền khi kết thúc game
     //Mix_FreeMusic(backgroundMusic);  // Giải phóng nhạc nền
@@ -550,9 +556,9 @@ int main(int argc, char* args[]) {
         cerr << "Failed to load background images!" << endl;
         return -1;
     }           
+    // 6 cai xuc xac
 
-    // Load ảnh xúc xắc
-    for (int i = 0; i < 6; i++) {
+   for (int i = 0; i < 6; i++) {
         diceTextures[i] = loadTexture("dice" + to_string(i + 1) + ".png");
         if (!diceTextures[i]) {
             cerr << "Failed to load dice" << i + 1 << ".png" << endl;
